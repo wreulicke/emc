@@ -19,7 +19,7 @@ $ emc --total-memory 1G <path/to/your.jar>
 
 ```bash
 # emc is not released yet. you can try with go get.
-go get github.com/wreulicke/emc
+go get github.com/wreulicke/emc/cmd/emc
 ```
 
 ## Usage
