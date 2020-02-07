@@ -35,7 +35,7 @@ func main() {
 	verbose := app.Flag("verbose", "Verbose").Default("false").Short('v').Bool()
 	totalMemory := app.Flag("total-memory", "Total memory. Required if is not limited by cgroup").Bytes()
 	loadedClassCount := app.Flag("loaded-class-count", "Loaded class count").Int64()
-	threadCount := app.Flag("thread-count", "Loaded class count").Default("250").Int64()
+	threadCount := app.Flag("thread-count", "thread count").Default("250").Int64()
 	javaOpts := app.Flag("java-options", "JVM Options").Envar("JAVA_OPTS").Default("").String()
 	headRoom := app.Flag("head-room", "Percentage of total memory available which will be left unallocated to cover JVM overhead").Default("0").Int()
 	jarOrDirectory := app.Arg("jarOrDirectory", "jar or directory").File()
