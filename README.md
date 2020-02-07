@@ -1,7 +1,9 @@
 ## Enhanced JVM Meomry Calculator
 
-emc is enhanced [cloudfoundry/java-buildpack-memory-calculator](https://github.com/cloudfoundry/java-buildpack-memory-calculator).
+emc is enhanced [cloudfoundry/java-buildpack-memory-calculator](https://github.com/cloudfoundry/java-buildpack-memory-calculator) and inspired by [making/memory-calculator-cnb](https://github.com/making/memory-calculator-cnb).
 emc counts classes in directory and classes in jar, and show memory options.
+
+
 
 ```bash
 # emc counts class in directory recursively. also supports jar in directory.
