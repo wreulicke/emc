@@ -34,7 +34,7 @@ Flags:
       --help              Show context-sensitive help (also try --help-long and --help-man).
   -v, --verbose           Verbose
       --total-memory=TOTAL-MEMORY  
-                          Total memory
+                          Total memory. Required if is not limited by cgroup
       --loaded-class-count=LOADED-CLASS-COUNT  
                           Loaded class count
       --thread-count=250  Loaded class count
