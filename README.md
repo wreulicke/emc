@@ -7,11 +7,11 @@ emc counts classes in directory and classes in jar, and show memory options.
 
 ```bash
 # emc counts class in directory recursively. also supports jar in directory.
-emc --total-memory 1G <path/to/directory>
+$ emc --total-memory 1G <path/to/directory>
 -XX:MaxDirectMemorySize=10M -XX:MaxMetaspaceSize=14447K -XX:ReservedCodeCacheSize=240M -Xmx266128K
 
 # emc counts class in jar recursively. also supports UberJar.
-emc --total-memory 1G <path/to/your.jar>
+$ emc --total-memory 1G <path/to/your.jar>
 -XX:MaxDirectMemorySize=10M -XX:MaxMetaspaceSize=14447K -XX:ReservedCodeCacheSize=240M -Xmx266128K
 ```
 
