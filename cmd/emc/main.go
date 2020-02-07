@@ -33,7 +33,7 @@ func getMemory() (units.Base2Bytes, error) {
 func main() {
 	app := kingpin.New("emc", "Enhanced java memory calculator")
 	verbose := app.Flag("verbose", "Verbose").Default("false").Short('v').Bool()
-	totalMemory := app.Flag("total-memory", "Total memory").Bytes()
+	totalMemory := app.Flag("total-memory", "Total memory. Required if is not limited by cgroup").Bytes()
 	loadedClassCount := app.Flag("loaded-class-count", "Loaded class count").Int64()
 	threadCount := app.Flag("thread-count", "Loaded class count").Default("250").Int64()
 	javaOpts := app.Flag("java-options", "JVM Options").Envar("JAVA_OPTS").Default("").String()
@@ -42,6 +42,9 @@ func main() {
 	app.Action(func(c *kingpin.ParseContext) error {
 		if *jarOrDirectory == nil && *loadedClassCount == 0 {
 			return fmt.Errorf("jarOrDirectory or loaded-class-count is not specified")
+		}
+		if *jarOrDirectory != nil && *loadedClassCount > 0 {
+			return fmt.Errorf("please specify either jarOrDirectory or loaded-class-count")
 		}
 		if int64(*totalMemory) == 0 {
 			t, err := getMemory()
