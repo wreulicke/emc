@@ -38,6 +38,7 @@ func main() {
 	threadCount := app.Flag("thread-count", "thread count").Default("250").Int64()
 	javaOpts := app.Flag("java-options", "JVM Options").Envar("JAVA_OPTS").Default("").String()
 	headRoom := app.Flag("head-room", "Percentage of total memory available which will be left unallocated to cover JVM overhead").Default("0").Int()
+	javaVersion := app.Flag("java-version", "Java version").Default("9").Int()
 	jarOrDirectory := app.Arg("jarOrDirectory", "jar or directory").File()
 	app.Action(func(c *kingpin.ParseContext) error {
 		if *jarOrDirectory == nil && *loadedClassCount == 0 {
@@ -64,10 +65,12 @@ func main() {
 			if err != nil {
 				return err
 			}
-			*loadedClassCount, err = emc.CountClassFile(j, fi)
+			actualClassCount, err := emc.CountClassFile(j, fi)
 			if err != nil {
 				return err
 			}
+			stdLibClassCount := emc.CountClassInStandardLibrary(*javaVersion)
+			*loadedClassCount = int64(0.35 * float64(actualClassCount+stdLibClassCount))
 		}
 		r, err := emc.Calculate(int64(*totalMemory), *loadedClassCount, *threadCount, *javaOpts, *headRoom)
 		if err != nil {
