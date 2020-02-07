@@ -12,6 +12,14 @@ import (
 	"github.com/saracen/walker"
 )
 
+func CountClassInStandardLibrary(version int) int64 {
+	if version < 9 { // OpenJDK 64-Bit Server VM (AdoptOpenJDK)(build 25.232-b09, mixed mode) based
+		return 30645
+	}
+	// See https://github.com/cloudfoundry/java-buildpack/blame/774ee920c266934cd486fb71cc9c1567c02f87a0/lib/java_buildpack/jre/open_jdk_like_memory_calculator.rb#L80
+	return 42215
+}
+
 func CountClassFileInDir(dir *os.File) (int64, error) {
 	var c int64 = 0
 	walkfn := func(pathname string, fi os.FileInfo) error {
