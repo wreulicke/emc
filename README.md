@@ -37,9 +37,10 @@ Flags:
                           Total memory. Required if is not limited by cgroup
       --loaded-class-count=LOADED-CLASS-COUNT  
                           Loaded class count
-      --thread-count=250  Loaded class count
+      --thread-count=250  thread count
       --java-options=""   JVM Options
       --head-room=0       Percentage of total memory available which will be left unallocated to cover JVM overhead
+      --java-version=11    Java version
 
 Args:
   [<jarOrDirectory>]  jar or directory
