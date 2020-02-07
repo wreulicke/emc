@@ -24,20 +24,20 @@ go get github.com/wreulicke/emc
 
 ```bash
 $ go run ./cmd/emc/ --help
-usage: emc --total-memory=TOTAL-MEMORY [<flags>] [<jarOrDirectory>]
+usage: emc [<flags>] [<jarOrDirectory>]
 
 Enhanced java memory calculator
 
 Flags:
       --help              Show context-sensitive help (also try --help-long and --help-man).
-  -v, --verbose           verbose
+  -v, --verbose           Verbose
       --total-memory=TOTAL-MEMORY  
                           Total memory
       --loaded-class-count=LOADED-CLASS-COUNT  
                           Loaded class count
       --thread-count=250  Loaded class count
       --java-options=""   JVM Options
-      --head-room=0       percentage of total memory available which will be left unallocated to cover JVM overhead
+      --head-room=0       Percentage of total memory available which will be left unallocated to cover JVM overhead
 
 Args:
   [<jarOrDirectory>]  jar or directory
