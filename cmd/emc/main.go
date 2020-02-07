@@ -38,7 +38,7 @@ func main() {
 	threadCount := app.Flag("thread-count", "thread count").Default("250").Int64()
 	javaOpts := app.Flag("java-options", "JVM Options").Envar("JAVA_OPTS").Default("").String()
 	headRoom := app.Flag("head-room", "Percentage of total memory available which will be left unallocated to cover JVM overhead").Default("0").Int()
-	javaVersion := app.Flag("java-version", "Java version").Default("9").Int()
+	javaVersion := app.Flag("java-version", "Java version").Default("11").Int()
 	jarOrDirectory := app.Arg("jarOrDirectory", "jar or directory").File()
 	app.Action(func(c *kingpin.ParseContext) error {
 		if *jarOrDirectory == nil && *loadedClassCount == 0 {
