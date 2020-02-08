@@ -50,7 +50,7 @@ func CountClassFileInDir(dir *os.File) (int64, error) {
 func CountClassFile(file *os.File, fi os.FileInfo) (int64, error) {
 	if fi.IsDir() {
 		return CountClassFileInDir(file)
-	} else if strings.HasSuffix(file.Name(), ".jar") {
+	} else if strings.HasSuffix(file.Name(), ".jar") || strings.HasSuffix(file.Name(), ".jmods") {
 		z, err := zip.NewReader(file, fi.Size())
 		if err != nil {
 			return -1, fmt.Errorf("cannot create zip reader. file=%s err=%v", file.Name(), err)
@@ -67,7 +67,7 @@ func CountClassFileInJar(z *zip.Reader, pathPrefix string) (int64, error) {
 			log.Println("found", pathPrefix+f.Name)
 			count++
 		}
-		if strings.HasSuffix(f.Name, ".jar") {
+		if strings.HasSuffix(f.Name, ".jar") || strings.HasSuffix(f.Name, ".jmods") {
 			r, err := f.Open()
 			if err != nil {
 				return -1, fmt.Errorf("cannot open %s err=%v", f.Name, err)
