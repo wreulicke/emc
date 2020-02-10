@@ -38,6 +38,7 @@ func main() {
 	threadCount := app.Flag("thread-count", "thread count").Default("250").Int64()
 	javaOpts := app.Flag("java-options", "JVM Options").Envar("JAVA_OPTS").Default("").String()
 	headRoom := app.Flag("head-room", "Percentage of total memory available which will be left unallocated to cover JVM overhead").Default("0").Int()
+	findLambda := app.Flag("find-lambda", "find lambda").Default("false").Hidden().Bool() // experimental
 	javaVersion := app.Flag("java-version", "Java version").Default("11").Int()
 	jarOrDirectory := app.Arg("jarOrDirectory", "jar or directory").File()
 	app.Action(func(c *kingpin.ParseContext) error {
@@ -65,7 +66,7 @@ func main() {
 			if err != nil {
 				return err
 			}
-			actualClassCount, err := emc.CountClassFile(j, fi)
+			actualClassCount, err := emc.CountClassFile(j, fi, *findLambda)
 			if err != nil {
 				return err
 			}
