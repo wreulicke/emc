@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
+	"net/http"
 
 	"log"
 	"os"
@@ -55,6 +56,36 @@ func CountClassFileInDir(dir *os.File, findLambda bool) (int64, error) {
 	}
 	err := walker.Walk(dir.Name(), walkfn)
 	return count, err
+}
+
+func CountClassFileWithPath(path string, findLambda bool) (int64, error) {
+	if strings.HasPrefix(path, "https://") || strings.HasPrefix(path, "https://") {
+		resp, err := http.DefaultClient.Get(path)
+		if err != nil {
+			return 0, err
+		}
+		defer resp.Body.Close()
+		b := &bytes.Buffer{}
+		_, err = io.Copy(b, resp.Body)
+		if err != nil {
+			return 0, err
+		}
+		r := bytes.NewReader(b.Bytes())
+		zr, err := zip.NewReader(r, r.Size())
+		if err != nil {
+			return 0, err
+		}
+		return CountClassFileInJar(zr, "/", findLambda)
+	}
+	file, err := os.Open(path)
+	if err != nil {
+		return 0, err
+	}
+	fi, err := file.Stat()
+	if err != nil {
+		return 0, err
+	}
+	return CountClassFile(file, fi, findLambda)
 }
 
 func CountClassFile(file *os.File, fi os.FileInfo, findLambda bool) (int64, error) {
