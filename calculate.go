@@ -1,8 +1,8 @@
 package emc
 
 import (
-	"github.com/cloudfoundry/java-buildpack-memory-calculator/calculator"
-	"github.com/cloudfoundry/java-buildpack-memory-calculator/flags"
+	"github.com/cloudfoundry/java-buildpack-memory-calculator/v4/calculator"
+	"github.com/cloudfoundry/java-buildpack-memory-calculator/v4/flags"
 )
 
 func Calculate(totalMemory int64, loadedClassCount int64, threadCount int64, javaOptons string, headRoom int) ([]string, error) {
