@@ -40,12 +40,12 @@ func main() {
 	headRoom := app.Flag("head-room", "Percentage of total memory available which will be left unallocated to cover JVM overhead").Default("0").Int()
 	findLambda := app.Flag("find-lambda", "find lambda").Default("false").Hidden().Bool() // experimental
 	javaVersion := app.Flag("java-version", "Java version").Default("11").Int()
-	jarOrDirectory := app.Arg("jarOrDirectory", "jar or directory").File()
+	jarOrDirectory := app.Arg("jarOrDirectory", "jar or directory or http/https schema").String()
 	app.Action(func(c *kingpin.ParseContext) error {
-		if *jarOrDirectory == nil && *loadedClassCount == 0 {
+		if jarOrDirectory == nil && *loadedClassCount == 0 {
 			return fmt.Errorf("jarOrDirectory or loaded-class-count is not specified")
 		}
-		if *jarOrDirectory != nil && *loadedClassCount > 0 {
+		if jarOrDirectory != nil && *loadedClassCount > 0 {
 			return fmt.Errorf("please specify either jarOrDirectory or loaded-class-count")
 		}
 		if int64(*totalMemory) == 0 {
@@ -61,12 +61,8 @@ func main() {
 		} else {
 			log.SetOutput(ioutil.Discard)
 		}
-		if j := *jarOrDirectory; j != nil {
-			fi, err := j.Stat()
-			if err != nil {
-				return err
-			}
-			actualClassCount, err := emc.CountClassFile(j, fi, *findLambda)
+		if jarOrDirectory != nil {
+			actualClassCount, err := emc.CountClassFileWithPath(*jarOrDirectory, *findLambda)
 			if err != nil {
 				return err
 			}
