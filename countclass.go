@@ -7,7 +7,6 @@ import (
 	"io"
 	"io/ioutil"
 
-	"log"
 	"os"
 	"strings"
 
@@ -32,7 +31,6 @@ func CountClassFileInDir(dir *os.File, findLambda bool) (int64, error) {
 			return nil
 		}
 		if shouldCount(pathname) {
-			log.Println("found", pathname)
 			count++
 			if findLambda && strings.HasPrefix(pathname, ".class") {
 				c, err := countLambdaClass(os.Open(pathname))
@@ -74,7 +72,6 @@ func CountClassFileInJar(z *zip.Reader, pathPrefix string, findLambda bool) (int
 	var count int64 = 0
 	for _, f := range z.File {
 		if shouldCount(f.Name) {
-			log.Println("found", pathPrefix+f.Name)
 			count++
 			if findLambda && strings.HasPrefix(f.Name, ".class") {
 				c, err := countLambdaClass(f.Open())
@@ -131,9 +128,6 @@ func countLambdaClass(r io.ReadCloser, err error) (int64, error) {
 				}
 			}
 		}
-	}
-	if count > 0 {
-		log.Printf("found lambda %d", count)
 	}
 	return count, nil
 }
