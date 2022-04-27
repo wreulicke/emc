@@ -1,23 +1,18 @@
 package emc
 
 import (
-	"github.com/cloudfoundry/java-buildpack-memory-calculator/v4/calculator"
-	"github.com/cloudfoundry/java-buildpack-memory-calculator/v4/flags"
+	"github.com/wreulicke/emc/calculator"
 )
 
 func Calculate(totalMemory int64, loadedClassCount int64, threadCount int64, javaOptons string, headRoom int) ([]string, error) {
-	h := flags.HeadRoom(headRoom)
-	options := flags.JVMOptions{}
+	options := calculator.JVMOptions{}
 	options.Set(javaOptons)
-	tc := flags.ThreadCount(threadCount)
-	tm := flags.TotalMemory(totalMemory)
-	lcc := flags.LoadedClassCount(loadedClassCount)
 	calc := calculator.Calculator{
-		HeadRoom:         &h,
+		HeadRoom:         headRoom,
 		JvmOptions:       &options,
-		ThreadCount:      &tc,
-		TotalMemory:      &tm,
-		LoadedClassCount: &lcc,
+		ThreadCount:      threadCount,
+		TotalMemory:      calculator.Size(totalMemory),
+		LoadedClassCount: loadedClassCount,
 	}
 	str, err := calc.Calculate()
 	if err != nil {
