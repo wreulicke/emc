@@ -32,7 +32,7 @@ func CountClassFileInDir(dir *os.File, findLambda bool) (int64, error) {
 		}
 		if shouldCount(pathname) {
 			count++
-			if findLambda && strings.HasPrefix(pathname, ".class") {
+			if findLambda && strings.HasSuffix(pathname, ".class") {
 				c, err := countLambdaClass(os.Open(pathname))
 				if err == nil {
 					count += c
@@ -73,7 +73,7 @@ func CountClassFileInJar(z *zip.Reader, pathPrefix string, findLambda bool) (int
 	for _, f := range z.File {
 		if shouldCount(f.Name) {
 			count++
-			if findLambda && strings.HasPrefix(f.Name, ".class") {
+			if findLambda && strings.HasSuffix(f.Name, ".class") {
 				c, err := countLambdaClass(f.Open())
 				if err == nil {
 					count += c
