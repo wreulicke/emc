@@ -14,7 +14,7 @@ import (
 	"github.com/cli/safeexec"
 	"github.com/paketo-buildpacks/libjvm/count"
 	"github.com/saracen/walker"
-	classfileParser "github.com/wreulicke/go-java-class-parser/classfile"
+	parser "github.com/wreulicke/classfile-parser"
 )
 
 func CountClassInStandardLibrary(version int) int64 {
@@ -126,18 +126,39 @@ func countLambdaClass(r io.ReadCloser, err error) (int64, error) {
 		return -1, err
 	}
 	defer r.Close()
-	bs, err := ioutil.ReadAll(r)
+	var count int64 = 0
+	classFile, err := parser.New(r).Parse()
 	if err != nil {
 		return -1, err
 	}
-	var count int64 = 0
-	classFile := classfileParser.Parse(bs)
-	for _, a := range classFile.Attributes() {
-		if v, ok := a.(*classfileParser.BootstrapMethodsAttribute); ok {
+	constants := classFile.ConstantPool.Constants
+	for _, a := range classFile.Attributes {
+		if v, ok := a.(*parser.AttributeBootstrapMethods); ok {
 			for _, m := range v.BootstrapMethods {
-				className := m.ClassName()
-				methodName, _ := m.NameAndDescriptor()
-				if className == "java/lang/invoke/LambdaMetafactory" && methodName == "metafactory" {
+				methodRefIndex := m.BootstrapMethodRef
+				methodHandle, ok := constants[methodRefIndex-1].(*parser.ConstantMethodHandle)
+				if !ok {
+					continue
+				}
+				methodRef, ok := constants[methodHandle.ReferenceIndex-1].(*parser.ConstantMethodref)
+				if !ok {
+					continue
+				}
+				class, ok := constants[methodRef.ClassIndex-1].(*parser.ConstantClass)
+				if !ok {
+					continue
+				}
+				nameAndType, ok := constants[methodRef.NameAndTypeIndex-1].(*parser.ConstantNameAndType)
+				if !ok {
+					continue
+				}
+				className := classFile.ConstantPool.LookupUtf8(class.NameIndex)
+				methodName := classFile.ConstantPool.LookupUtf8(nameAndType.NameIndex)
+				if className == nil || methodName == nil {
+					continue
+				}
+				if className.String() == "java/lang/invoke/LambdaMetafactory" &&
+					methodName.String() == "metafactory" {
 					count++
 				}
 			}
