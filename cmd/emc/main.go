@@ -5,34 +5,57 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
-	"strconv"
 	"strings"
 
 	"github.com/alecthomas/units"
 	"github.com/wreulicke/emc"
+	"github.com/wreulicke/emc/calculator"
 	"gopkg.in/alecthomas/kingpin.v2"
 )
 
-func getMemory() (units.Base2Bytes, error) {
-	bs, err := ioutil.ReadFile("/sys/fs/cgroup/memory/memory.limit_in_bytes")
-	if err != nil {
-		return -1, fmt.Errorf("cannot detect memory limit automatically: %v", err)
-	}
-	v := strings.TrimSpace(string(bs))
-	if v == "9223372036854771712" {
-		return 1 * units.GiB, nil
-	}
-	i, err := strconv.ParseInt(v, 10, 64)
-	if err != nil {
-		return -1, fmt.Errorf("cannot parse memory limit from /sys/fs/cgroup/memory/memory.limit_in_bytes: %v", err)
-	}
-	return units.Base2Bytes(i), nil
+const (
+	DefaultMemoryLimitPathV1 = "/sys/fs/cgroup/memory/memory.limit_in_bytes"
+	DefaultMemoryLimitPathV2 = "/sys/fs/cgroup/memory.max"
+	UnsetTotalMemory         = calculator.Size(9_223_372_036_854_771_712)
+)
 
+func getMemory() (calculator.Size, error) {
+	v, err := getMemoryLimit(DefaultMemoryLimitPathV1)
+	if err != nil {
+		return -1, err
+	}
+	if v == UnsetTotalMemory {
+		v, err = getMemoryLimit(DefaultMemoryLimitPathV2)
+		if err != nil {
+			return -1, err
+		}
+	}
+	// TODO parse /proc/meminfo
+
+	if v == UnsetTotalMemory {
+		return calculator.Size(1 * calculator.Gibi), nil
+	}
+	return v, nil
+}
+
+func getMemoryLimit(path string) (calculator.Size, error) {
+	bs, err := os.ReadFile(path)
+	if !os.IsNotExist(err) {
+		return UnsetTotalMemory, nil
+	} else if err == nil {
+		s, err := calculator.ParseSize(strings.TrimSpace(string(bs)))
+		if err != nil {
+			return UnsetTotalMemory, nil
+		}
+		return s, nil
+	}
+	return UnsetTotalMemory, nil
 }
 
 func main() {
 	app := kingpin.New("emc", "Enhanced java memory calculator")
 	verbose := app.Flag("verbose", "Verbose").Default("false").Short('v').Bool()
+	// TODO: currently total memory is not same interface for jvm...
 	totalMemory := app.Flag("total-memory", "Total memory. Required if is not limited by cgroup").Bytes()
 	loadedClassCount := app.Flag("loaded-class-count", "Loaded class count").Int64()
 	threadCount := app.Flag("thread-count", "thread count").Default("250").Int64()
@@ -53,7 +76,7 @@ func main() {
 			if err != nil {
 				return err
 			}
-			*totalMemory = t
+			*totalMemory = units.Base2Bytes(t)
 		}
 
 		if *verbose {
