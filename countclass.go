@@ -6,15 +6,29 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
+	"path/filepath"
 
 	"os"
 	"strings"
 
+	"github.com/cli/safeexec"
+	"github.com/paketo-buildpacks/libjvm/count"
 	"github.com/saracen/walker"
 	classfileParser "github.com/wreulicke/go-java-class-parser/classfile"
 )
 
 func CountClassInStandardLibrary(version int) int64 {
+	path, err := safeexec.LookPath("java")
+	if err == nil {
+		p, err := filepath.Abs(filepath.Join(filepath.Dir(path), "..", "lib", "modules"))
+		if err == nil {
+			v, err := count.ModuleClasses(p)
+			if err == nil {
+				return int64(v)
+			}
+		}
+	}
+
 	if version < 9 { // OpenJDK 64-Bit Server VM (AdoptOpenJDK)(build 25.232-b09, mixed mode) based
 		return 30645
 	}
